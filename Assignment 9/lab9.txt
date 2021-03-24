@@ -1,0 +1,128 @@
+Bryan Pham
+UID: 105-105-100
+
+Assignment 9
+
+Laboratory: Git Spelunking
+
+1. Command: [man du]
+	Find out what the du command does. It estimates file space usage. Two useful flags I found were the -c and -h flags which produce a grand total
+	and output the size in a human readable format respectively. Exluding a directory can be done by using --exclude=PATTERN option. The -s flag 
+	allows you tosummarize only a total for each given argument. 
+
+2. Command: [du -hc .git]
+	This command gives the total disk space used by the .git (which is the git repository) in human readable format. The .git repo takes: 415M bytes.
+	This command output:
+8.0K    .git/info
+60K     .git/hooks
+4.0K    .git/branches
+4.0K    .git/refs/heads/feature
+4.0K    .git/refs/heads/features
+4.0K    .git/refs/heads/fix
+4.0K    .git/refs/heads/heads
+4.0K    .git/refs/heads/old-branches
+4.0K    .git/refs/heads/other-branches
+4.0K    .git/refs/heads/scratch/joaot
+4.0K    .git/refs/heads/scratch/np
+4.0K    .git/refs/heads/scratch/ns
+4.0K    .git/refs/heads/scratch/tzz
+24K     .git/refs/heads/scratch
+52K     .git/refs/heads
+4.0K    .git/refs/tags
+4.0K    .git/refs/remotes/origin
+8.0K    .git/refs/remotes
+68K     .git/refs
+406M    .git/objects/pack
+7.8M    .git/objects/info
+414M    .git/objects
+8.0K    .git/logs/refs/remotes/origin
+12K     .git/logs/refs/remotes
+96K     .git/logs/refs/heads/feature
+8.0K    .git/logs/refs/heads/features
+56K     .git/logs/refs/heads/fix
+8.0K    .git/logs/refs/heads/heads
+100K    .git/logs/refs/heads/old-branches
+80K     .git/logs/refs/heads/other-branches
+8.0K    .git/logs/refs/heads/scratch/joaot
+8.0K    .git/logs/refs/heads/scratch/np
+12K     .git/logs/refs/heads/scratch/ns
+16K     .git/logs/refs/heads/scratch/tzz
+312K    .git/logs/refs/heads/scratch
+756K    .git/logs/refs/heads
+772K    .git/logs/refs
+780K    .git/logs
+415M    .git
+415M    total
+
+Based on the output above, we can see that the file directory named .git/objects takes up most of the repo at 414M bytes. This is because each of the 
+objects that are in this file are either a blob, a commit, a tree, or a tag object. All of these objects together are the full history of the repository,
+which is probably why it takes up the most space.
+
+3. Command: [du -hc --exclude=.git]
+	This output the total disk space usage in human readable format excluding the .git repo. The working files in this directory take up a total of 
+	163M bytes.
+
+4. Command: [git branch -a | wc -l]
+	This was the first command that I used. The -a flag lists all remote and local branches, and I piped the command into the [wc] command.
+	There are 353 total branches. I found out that the -r flag when used with [git branch] acts on the remote-tracking branches. So to alter the 
+	first command, I used [git branch | wc -l] which gives 176 branches (local). Then I used [git branch -r | wc -l] which gave 177 branches (remote).
+	Add both counts together, I got 177 remote + 176 local = 353 total branches as expected.
+
+5. Command: [git remote -v]
+	This command outputs all the remote repositories. The -v flag displays their locations and url. The commands shows that there are 2 remote repos:
+	origin and savannah. They can both be found at '/u/cs/fac/eggert/src/gnu/emacs' and 'https://git.savannah.gnu.org/git/emacs.git' respectively.
+
+6. Command: [git for-each-ref --sort=committerdate refs/heads --format='%(committerdate:short) %(authorname) %(refname:short)'] and
+		git for-each-ref --sort=-committerdate refs/heads --format='%(committerdate:short) %(refname:short)'
+	The --sort will sort based on a particular field name in ascending order, and adding the '-' prefix will sort in descending order. In this case I 
+	sorted using the field name -> committerdate. The --format decides what is acutally outputted. I outputted the date, name of the comitter, and the
+	branch name.
+	The 10 most recent branch commits, their dates newests to oldest, and the name of the committers are:
+
+2020-05-24 Stefan Kangas master
+2019-11-20 João Távora scratch/joaot/make-completion-at-point-function
+2019-11-18 Phillip Lord feature/windows-with-utils
+2019-11-16 Stefan Monnier scratch/completion-api
+2019-11-10 João Távora scratch/a-modest-completion-redesign-proposal
+2019-11-05 João Távora scratch/fido-mode
+2019-11-03 Andrew G Cohen feature/gnus-select2
+2019-10-14 Jimmy Aguilar Mena feature/extend_face_id
+2019-10-10 João Távora scratch/jit-lock-antiblink-cleaned-up
+2019-10-07 Leo Liu emacs-26
+
+7. Command: [git rev-list master --count]
+	This command counts all the commits made to a certain branch. I used the command on the master branch. The output was: 141268 commits (reachable from master)
+	NOTE: For some reason this command did not work on lnxsrv05, but it worked when I switched to lnxsrv07.
+
+8. Command: [git rev-list --all --count]
+	Counts all commits from all branches. The output was: 145595. Taking the all the commits from the master branch and dividing them from the total branch:
+	141268/145596 = 97.02739% of all commits belong to the master branch commits.
+
+9. Command: [git shortlog -ns --since="2013-01-01 00:00:00"]
+	The -n flag will sort the commits by number of commits from greatest to least. The -s flag will provide only a commit count. The --since and 
+	--until allow a specified time range. The output of this command up to the 10th highest committer from 2013 and on is:
+
+3922  Eli Zaretskii
+3795  Glenn Morris
+3785  Paul Eggert
+1887  Stefan Monnier
+1833  Lars Ingebrigtsen
+1671  Michael Albinus
+671  Dmitry Gutov
+604  Noam Postavsky
+568  Juri Linkov
+506  Alan Mackenzie
+
+10. Command: [ssh -X classpha@lnxsrv07.seas.ucla.edu] [cd ~eggert/src/gnu/emacs-CS-35L] [gitk]
+
+Of the provided commits, these are the merge commits (which I determined by 
+typing in the first few characters of the commit into the "SHA1 ID:" search 
+section, and looking at the view window to see if the graph represented 
+a merge):
+
+0c06b93c1e467debd401eb0b3be4652fde14fa95 (merge from origin/emacs-26)
+abcb2e62dae6aa26308f7ac9efc89247f89cbe65 (merge from origin/emacs-26)
+98ac36efe4ce4bd3a0bca76fc73ce6c7abaa4371 (merge from origin/emacs-26)
+
+
+
