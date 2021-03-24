@@ -1,0 +1,16 @@
+Bryan Pham UID: 105 - 105 - 100
+
+Lab 2 Log:
+
+1. I will be using the linux server 09 and 10 for initial part of the lab. I am on a windows machine and using Xming for X11 forwarding.
+
+2. First I used the command ssh to log into lnxsrv09 (I was logged into linux server 4). The command I used was [ssh -X classpha@lnxsrv09.seas.ucla.edu] and I was prompted to insert my password for SEAS.
+
+3. I then used the command  [eval $(ssh-agent)]  to check if the process was running. Then I created a pair of keys using the command [ssh-keygen] which created a .ssh file directory.
+   I was given a key fingerprint and randomart image. To check if the key was made, I did [cd .ssh] and then I used [ls]. Inside, there was id_rsa and id_rsa.pub to denote which was public and which was private.
+
+4. I used [cd ~] to go back to the home directory and then [ssh-add] to add the key to the agent. Finally I used [ssh-copy-id classpha@lnxsrv10.seas.ucla.edu] to copy the id to the server that I am trying to ssh to.
+
+5. I then checked to see whether or not it worked by ssh'ing into the linux server 10. I was able to get into the server without being prompted for a password or needing to put one in.
+
+6. I was able to "daisy-chain" by hopping from lnxsrv09 to lnxsrv10 to lnxsrv07. Then I tried the [xeyes] command on lonxsrv07 and a little GUI popped up. It was a pair of eyes that was tracking my mouse.
