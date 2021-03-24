@@ -1,0 +1,93 @@
+Lab 5 Log
+Bryan Pham
+UID: 105-105-100
+
+1. [wget https://web.cs.ucla.edu/classes/fall20/cs35L/assign/coreutils-with-bug.tar.gz]
+	Command used to get the link for the tar file.
+
+2. [tar -xf coreutils-with-bug.tar.gz]
+	Command used to unzip the tar file, with the flags -xf, to extract and specify file name respectively
+
+3. Once the tar file was extracted, I cd into the directory that I extracted it in and then used the command 
+   [./configure --prefix=/u/ch/ugrad/bryan/coreutils] so that the we install in a location that is not the default
+   /usr/local/bin. This command also creates a makefile.
+
+4.I then used [make], which compiles the package, however when I compiled the file, I received an error that stated:
+  
+  utimens.h:2:5: error: conflicting types for 'futimens'
+  
+  This is because we are essentially redefining a function that already exists.
+
+5.[wget https://web.cs.ucla.edu/classes/fall20/cs35L/assign/coreutils.diff]
+  I used this command to get the patch/diff file.
+
+6.[patch -p0 < coreutils.diff]
+  This command applies the patch based on the differences from the .diff 
+
+7.[make] [make install]
+  Compiles and installs the package.
+
+8.[tmp=$(mktemp -d)]
+  [cd $tmp]
+  [touch -d '1918-11-11 11:00 GMT' wwi-armistice]
+  [touch now]
+  [sleep 1]
+  [touch now1]
+  [TZ=UTC0 ~/coreutils/bin/ls -lt --full-time wwi-armistice now now1]
+
+ The commands above reproduce the bug by creating a temporary directory with 3 files.
+ Output:
+ We get the following output:
+-rw-r--r-- 1 bryan chugrad 0 1918-11-11 11:00:00.000000000 +0000 wwi-armistice
+-rw-r--r-- 1 bryan chugrad 0 2018-11-02 05:41:53.634318239 +0000 now1
+-rw-r--r-- 1 bryan chugrad 0 2018-11-02 05:41:36.728852846 +0000 now
+We see that the bug has been reproduced because it acts as if the file with a time 
+stamp very far in the past is supposedly from the future. Specifically, it listed 
+the "wwi-armistice" as most recent, when it is obviously the oldest file of the three.
+
+9. [gdb ~/coreutils/bin/ls]
+   Opens the debugger so we can find the source of the bug
+
+10. [break main]
+We set a breakpoint at the main method so we can step through the program.
+
+11. [run -lt --full-time /tmp/tmp.HtCcE8DEn5]
+Now we run the ls command within gdb. It stops at the first breakpoint, the main method.
+
+12. [next] (multiple times)
+We repeatedly step through the code of the program until we see the sort_files() function,
+which sounds like it could be responsible for the bug. 
+
+13. [break sort_files]
+Now, we set a breakpoint at the sort_files() function so we can examine it further.
+
+14. [continue]
+Keep running until we reach the sort_files() function.
+
+15. [step] (multiple times)
+    Here, we know that qsort should be correct because it is a given function from the C standard library
+    Let's take a look at the compare_mtime function
+
+16. [break compare_mtime] sets a breakpoint at that function, then I used continue until we reach the breakpoint.
+
+17. [list] This displays the contents of the compare_mtime function. Inside, we can see that timespec_cmp is called.
+
+18. [break timespec_cmp] [continue] [list]
+    Same process as the compare_mtime function
+    Inside the timespec_cmp function, the difference is calculated incorrectly. So then we go to modify the timespec.h file.
+
+19. [emacs timespec.h]
+    Once inside, we modify it so that the correct difference is calculated, along with guarding against overflow.
+
+20. [diff -u coreutils-with-bug/lib/timespec.h timespec.h > coreutils-with-bug/lab4.diff]
+    Now, we create the patch file using the diff -u command. 
+
+29. [cd coreutils-with-bug] [emacs lab4.diff] [C-x 4-a]
+Now, we edit the file so it is in the form of a ChangeLog entry. We use [C-x 4-a] to add a ChangeLog entry. 
+We also paste our entry into the diff file itself. We also have to ensure that we have the correct paths
+by using lib/timespec.h.
+
+30. [patch -p0 < lab4.diff] [make] [make install]
+    Applies the patch, compiles the package, and installs.
+    
+   
