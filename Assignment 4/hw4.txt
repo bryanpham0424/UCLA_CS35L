@@ -1,0 +1,17 @@
+Bryan Pham UID: 105-105-100
+
+Homework Answers:
+1. The patch did improve the performance of ls because now the command is more consistent when used with flags in a given order.
+   In terms of time, I not 100% but I believe it is slower because now it has to check whether or not the '.' and '..' directories are there.
+
+2. Coreutils may or may not override some files or something when introduced.
+
+3. When ran with dev/null, there are no issues. An issue appears when the generator.chooseline() is ran. /dev/null is opened with open(), and 
+   then the lines inside the file are stored in a variable. random.choice is then called on that variable. The error is that there are no lines
+   in the dev/null file, so random.choice can't select anything.
+
+4. When the script is ran with Python 3, there is a syntax error at the beginning of the try-except block that comes after the arguments and 
+   when the options have been processed. I believe this is just because of a change in syntax from Python 2 to Python 3.
+
+5. After testing my shuf.py script with Python 2 and Python 3, I believe it is backwards compatible as there were no major difference or errors.
+   String behavior is essentially the same, just with different encodings. 

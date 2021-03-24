@@ -1,0 +1,37 @@
+Bryan Pham UID: 105-105-100
+
+Lab 4 Log:
+1. The first thing I did was download the tar file, the signature, and the keyring to my local machine. Afterwords, I moved them into 
+   the linux server thorugh MobaXTerm. I know that alternatively, I could've used the [wget] command to just download straight from 
+   the website itself. Once they were moved into a directory that I created for this assignment/lab, I ran a command to verify the signature 
+   using [gpg --verify --keyring ./gnu-keyring.gpg coreutils-8.29.tar.xz.sig]. Once the command was executed, the signature was verified
+   with "Good signature", however there was a warning from gpg saying the the key was not certified with a trusted signature. I assume this 
+   is because the key is public, therefore anyone has access to it.
+
+2. To open the extract the tar file, I used the command [tar -xf coreutils-8.29.tar.xz], this extracted the tar file into a the directory.
+   Afterwards, I used [cd coreutils-8.29.tar.xz] to enter the directory.
+
+3. The following steps were to compile and install the package.
+	- [./configure --prefix=directory]
+		- This command executes the configure script. The '--prefix' flag was to specify an absolute path for installation instead of the default.
+	- [make]
+		- This command compiles the package.
+	- [make install]
+		- This command installs the package and data files.
+   I did not encounter any problems during this process.
+
+4. The next chain of commands that I used was [cd ..], [coreutils_older/bin/ls -aA], [coreutils_older/bin/ls -A] to try and replicate the bug.
+   The bug appear as expected, with all the files appearing in addition to the '.' and '..' directories.
+
+5. Next I did [cd coreutils-8.29], then [emacs patch.diff]. The patch.diff file will contain all the differences from the patch given to us by
+   Professor Eggert. Once the patch files was made, I ran the following commands in order:
+	- [patch -p1 < patch.diff]
+		- '-p1' flag removes the first forward slash in the path to original and modified paths that are specified in patch.diff.
+		- No errors were encountered
+	- [autoreconf --force --install]
+		- Updates configurations
+	- [make] and [make install]
+		- Compile and install programs and data files
+
+6. Once completed, I did [cd ~] and [coreutils_older/bin/ls -aA]. Sure enough, all files/directories were displayed without the '.' amd '..' directories.
+
