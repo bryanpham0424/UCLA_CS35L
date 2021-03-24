@@ -1,0 +1,100 @@
+Assignment 7
+
+Bryan Pham UID: 105-105-100
+
+Laboratory: Who's linked to what?
+
+1. Command: [wget link]
+	Pulled the simpgmp.c file from the class website
+2. Command: [gcc -lgmp simpgmp.c -o simpgmp]
+	Compile and build the program
+3. Command: [./simpgmp] [./simpgmp 24]
+	The first command was to test and see how the function worked.  The second command actually evaluated 2^24.
+	The function returned: 16777216
+4. Command: [./simpgmp 16777216]
+	This was to compute 2^(2^24). The value was too large for me to copy and paste here.
+5. Command: [./simpgmp 16777216 > s2] [cat s2 | wc -m] [cat s2 | head -c 4] [cat s2 | tail -c 5]	
+	The first command saves the result of 2^(2^24). The second command counts the digits of s2, which outputted: 5,050,447. This is because there is a character at the end to signify the end of the string. The third command prints the 
+	first 4 digits of s2, which outputted 1818. The last command is to print the last 4 digits of the s2, which outputted: 7536
+6. Command: [ldd simpgmp]
+	Checks how many dynamic libraries were used. There were 4:
+
+	linux-vdso.so.1 =>  (0x00007ffd8adea000)
+        libgmp.so.10 => /lib64/libgmp.so.10 (0x00007fdc93a9c000)
+        libc.so.6 => /lib64/libc.so.6 (0x00007fdc936ce000)
+        /lib64/ld-linux-x86-64.so.2 (0x00007fdc93d14000)
+
+7. Command: [strace -c ./simpgmp 14563]
+	Find out all the system calls the program makes. Output:
+	
+	% time     seconds  usecs/call     calls    errors syscall
+------ ----------- ----------- --------- --------- ----------------
+ 26.37    0.000106          11        10           mmap
+ 21.89    0.000088          15         6           mprotect
+ 11.44    0.000046          15         3           open
+  7.71    0.000031           8         4           brk
+  6.72    0.000027          27         1           execve
+  5.72    0.000023          23         1           munmap
+  5.22    0.000021           5         4           fstat
+  4.98    0.000020           7         3           close
+  4.73    0.000019          10         2           read
+  3.48    0.000014          14         1         1 access
+  1.74    0.000007           7         1           arch_prctl
+  0.00    0.000000           0         2           write
+------ ----------- ----------- --------- --------- ----------------
+100.00    0.000402                    38         1 total
+
+It seems mmap, brk, open, close, fstat, access, and execve all relate to dynamic linking. 
+
+8. Command: [ls /usr/bin | awk '(NR-nnnnnnnnn)%251 == 0']
+	This command gave 9 different commands to investigate
+9. Invoke ldd on all of them. Command was : [ldd /usr/bin/(name of command from previous step)]
+	- col
+	- fc-list
+	- gvfs-less 
+		not a dynamic exectuable
+	- killall
+	- mkafmmap
+	- panelctl
+	- qcatool2
+	- stapbpf
+	- wmf2fig
+
+10. Command: [chmod +x ldd_run]
+	Gives execution permission to the ldd_run script given to us in the hints.
+
+11. Command: [./ldd_run | grep so | sort -u] 
+	This will output all dynamic libraries from the previous commands and sorts them. Remove duplicates manually
+
+	Output:
+		/lib64/ld-linux-x86-64.so.2 (0x00007fe0d0c32000)
+	libX11.so.6 => /lib64/libX11.so.6 (0x00007f279800a000)
+	libXau.so.6 => /lib64/libXau.so.6 (0x00007f279760c000)
+	libXmuu.so.1 => /lib64/libXmuu.so.1 (0x00007f2798348000)
+	libattr.so.1 => /lib64/libattr.so.1 (0x00007fd5d598e000)
+	libbz2.so.1 => /lib64/libbz2.so.1 (0x00007fb151678000)
+	libc.so.6 => /lib64/libc.so.6 (0x00007f2797c3c000)
+	libcap.so.2 => /lib64/libcap.so.2 (0x00007fb153993000)
+	libdbus-1.so.3 => /lib64/libdbus-1.so.3 (0x00007fb1543b3000)
+	libdl.so.2 => /lib64/libdl.so.2 (0x00007fb152333000)
+	libdw.so.1 => /lib64/libdw.so.1 (0x00007fb152537000)
+	libelf.so.1 => /lib64/libelf.so.1 (0x00007fb151a9e000)
+	libgcc_s.so.1 => /lib64/libgcc_s.so.1 (0x00007fd5d617d000)
+	libgcrypt.so.11 => /lib64/libgcrypt.so.11 (0x00007fb152ba6000)
+	libgpg-error.so.0 => /lib64/libgpg-error.so.0 (0x00007fb1529a1000)
+	liblz4.so.1 => /lib64/liblz4.so.1 (0x00007fb152e27000)
+	liblzma.so.5 => /lib64/liblzma.so.5 (0x00007fb15303c000)
+	libm.so.6 => /lib64/libm.so.6 (0x00007fe0cfe63000)
+	libnetpbm.so.11 => /lib64/libnetpbm.so.11 (0x00007fc884e9e000)
+	libotf2.so.5 => /lib64/libotf2.so.5 (0x00007f6f71bfd000)
+	libpcre.so.1 => /lib64/libpcre.so.1 (0x00007fb151cb6000)
+	libpthread.so.0 => /lib64/libpthread.so.0 (0x00007fe0d0165000)
+	libresolv.so.2 => /lib64/libresolv.so.2 (0x00007fb152788000)
+	librt.so.1 => /lib64/librt.so.1 (0x00007fe0d0381000)
+	libselinux.so.1 => /lib64/libselinux.so.1 (0x00007fb153262000)
+	libstdc++.so.6 => /lib64/libstdc++.so.6 (0x00007f6f718f6000)
+	libsystemd.so.0 => /lib64/libsystemd.so.0 (0x00007fb153f66000)
+	libtokyocabinet.so.9 => /lib64/libtokyocabinet.so.9 (0x00007fe0d09af000)
+	libxcb.so.1 => /lib64/libxcb.so.1 (0x00007f2797a14000)
+	libz.so.1 => /lib64/libz.so.1 (0x00007fe0d0589000)
+	linux-vdso.so.1 =>  (0x00007fffdcf94000)
