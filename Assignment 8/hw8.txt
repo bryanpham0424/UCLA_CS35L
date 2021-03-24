@@ -1,0 +1,125 @@
+Bryan Pham 
+UID: 105-105-100
+Assignment 8
+
+Homework: Verifying and publishing a backported change
+
+1. Command: [git clone link diffutils-hw]
+	I decided to make another clone of the repository to ensure that everything is the same as the one from the website. Additionally, I didn't want to potentially
+	change anything from my previous work in case I need to go back to it.
+
+2. Command: [git checkout v3.0 -b quote]
+	Creates a new branch called 'quote' at the current commit.
+
+3. Command: [patch -p1 < ../quote-3.0-patch.txt]
+	Installs previously created patch. The output to standard out was:
+	
+patching file src/cmp.c
+patching file src/diff.c
+patching file src/diff3.c
+patching file src/dir.c
+patching file src/sdiff.c
+patching file src/util.c
+
+4. Command: [emacs file_name] [C-x 4 a]
+	This creates a change log for each of the files from the previous step.
+
+5. Command [git add .] [git commit -F ChangeLog]
+	This adds all the files to the index. The second command commits the change to the branch.
+
+
+
+-------------- Side Note --------------
+
+So when I initially ran these commands above, I wasn't sure what to expect. The output was: 
+
+[quote 407a41b] 2020-12-08  Bryan Long Pham  <classpha@lnxsrv11.seas.ucla.edu>
+ Committer: Bryan Long Pham <classpha@lnxsrv11.seas.ucla.edu>
+Your name and email address were configured automatically based
+on your username and hostname. Please check that they are accurate.
+You can suppress this message by setting them explicitly. Run the
+following command and follow the instructions in your editor to edit
+your configuration file:
+
+    git config --global --edit
+
+After doing this, you may fix the identity used for this commit with:
+
+    git commit --amend --reset-author
+
+ 7 files changed, 57 insertions(+), 52 deletions(-)
+ create mode 100644 #ChangeLog#
+
+However, I opened the ChangeLog itself in emacs, and I realized that I actually didn't put a message in about he commit. So I went back
+and added a message to it, and reused the same commands. The output was:
+
+[quote 912e9be] 2020-12-08  Bryan Long Pham  <classpha@lnxsrv11.seas.ucla.edu>
+ Committer: Bryan Long Pham <classpha@lnxsrv11.seas.ucla.edu>
+Your name and email address were configured automatically based
+on your username and hostname. Please check that they are accurate.
+You can suppress this message by setting them explicitly. Run the
+following command and follow the instructions in your editor to edit
+your configuration file:
+
+    git config --global --edit
+
+After doing this, you may fix the identity used for this commit with:
+
+    git commit --amend --reset-author
+
+ 1 file changed, 5 deletions(-)
+ delete mode 100644 #ChangeLog#
+
+So I believe that the correct commit is the one prior to this one, although I'm not sure, and I'm not confident enough to use [git reset]
+to revert changes.
+
+-------------- End of  Side Note --------------
+
+
+6. Command: [git am < ../formatted-patch.txt]
+
+I'm not sure if this has to do with what happened in the previous step, but I received a message saying:
+
+Applying: 2020-12-08 Bryan Long Pham <classpha@lnxsrv11.seas.ucla.edu>
+error: #ChangeLog#: does not exist in index
+Patch failed at 0001 2020-12-08 Bryan Long Pham <classpha@lnxsrv11.seas.ucla.edu>
+When you have resolved this problem run "git am --resolved".
+If you would prefer to skip this patch, instead run "git am --skip".
+To restore the original branch and stop patching run "git am --abort".
+
+The #Changelog# file was there before I performed the second [git commit]. I am unable to continue and I can't figure out why.
+I was unable to then perform the verificaton of my patch working, and also was unable to verify if my changelog worked.
+
+7. Describe the merge point and the subwindows and what they do:
+
+[cd ~eggert/src/gnu/emacs-CS-35L], [gitk] to run gitk on the specified GNU
+Emacs git repo
+
+XQuartz now opens with the visualization of the master branch details.
+
+First of all, the newest merge that is not newer than 1/25/15 was made on 
+1/25/15 at 23:56:37, made by Trevor Murphy
+
+There are a few subwindows that were opened. 
+
+The top left subwindow shows the tree representation of all the commits and 
+merges to the master branch. The top middle subwindow shows the author of the 
+commit or merge, along with his/her email. The top right subwindow shows the 
+date of the commit/merge.
+
+There is a bar across the middle of the GUI showing the SHA ID for a 
+selected commit/merge. It also gives the option to search through the whole
+GUI for any keywords.
+
+The bottom left side shows three subwindows; the top gives details about
+a commit, including the author, parent and child commits, and branches. 
+For example, the author was Trevor Murphy and the committer was 
+Katsumi Yamaoka. The middle subwindow shows the ChangeLog for that commit, and
+in this specific case, it shows that the mm-decode.el file was changed to
+"Make non-string methods work." Lastly, the bottom subwindow shows the 
+differences, in a '.el' file format, although the differences themselves are 
+similar to the format resulted by from the diff command.
+
+The bottom right side has a subwindow that contains a comment section, outlining
+the files displayed on the bottom left side. In this case, lisp/gnus/ChangeLog 
+and list/gnus/nnimap.el are shown.
