@@ -1,0 +1,147 @@
+Bryan Pham
+UID: 105-105-100
+
+Assignment 6
+
+1. Write a C transliteration program tr2b.c that uses getchar and putchar to transliterate bytes (tr2b.c):
+- Made helper functions that checked for input and output error
+- Main function that takes in arguments, as sepcified with 'int argc' and 'char** argv'
+- Wrote code to iterate through "from" string to look for duplicates and to compare lengths of "from" and "to" strings
+- argc must be 3 meaning the program name and two character sets are provided
+- retrieved characters with getchar() and trasliterate them if matching any character in "from" string
+- transliteration function does processing, using "from" and "to" strings
+
+2. Write a C program tr2u.c that uses read and write to transliterate bytes, instead of using getchar and putchar. The nbyte arguments to read and write should be 1, so that the program reads and writes single bytes at a time.
+- Same as above, but with modifications
+- Return values are of ssize_t for read() and write()
+- Return values are either -1 or 0, so errors are treated differently
+- NUmber of bytes need to be passed to read/write 
+
+3. Use the strace command to compare the system calls issued by your tr2b and tr2u commands (a) when copying one file to another, and (b) when copying a file to your terminal. Use a file that contains at least 5,000,000 bytes.
+- Write short python script to generate a string of over 5 million bytes
+- Use the random library to generate an int which can be converted into a char
+- Place this logic into a loop that iterates over 5 million times
+- Use built in file opening and writing functions to write this string to file
+- [cat large_text_file | wc -c] to confirm the byte count is over 5 million
+
+-[strace -c ./tr2b 'belo what' 'is yoursn' < large_file.txt > 
+  large_file_output.txt]
+- -c option will give certain numbers about the performance of the program,
+including time taken by each syscall and the total number of syscalls
+- Test performance of tr2b program with strace, which returns the time taken as
+well as the number of system calls made
+- 1860 system calls were made
+
+-[strace -c ./tr2b 'belo what' 'is yoursn' < large_file.txt]
+- Same command, but file is copied to terminal instead
+- 21903 system calls were made
+
+-[strace -c ./tr2u 'belo what' 'is yoursn' < large_file.txt > 
+  large_file_output2.txt]
+- Repeat with tr2u program
+- 14999818 system calls were made
+- This is a drastic difference due to tr2u making a system call for each
+read and write for each of the 5 million bytes, while tr2b buffers these 
+read and write calls to ultimately make many, many less expensive system calls
+
+-[strace -c ./tr2u 'belo what' 'is yoursn' < large_file.txt]
+- Same command, but file is copied over to the terminal instead
+- 14999818 system calls were made.
+
+As expected, tr2u makes more system calls than tr2b. However, it is noticed
+that for tr2b, more system calls are made when a file is
+copied over to the terminal, rather than to another file, but this is not true
+for tr2u. This makes sense because writing to the terminal likely requires more 
+system calls than writing to a file, because there are less risks involved in 
+writing to a file. Thus, the additional system calls do not need to be made.
+Because tr2u is already making a system call for each read and write, there
+shouldn't be any difference for tr2u.
+
+4. Use the time command to measure how much faster one program is, compared to the other, when copying the same amount of data.
+- [time ./tr2b 'belo what' 'is yoursn' < large_file.txt > 
+large_file_output.txt] to measure time taken to run tr2b
+
+Output: It took 0.844 seconds (real time) to run the tr2b program
+
+real	0m0.844s
+user	0m0.682s
+sys		0m0.019s
+
+- [time ./tr2u 'belo what' 'is yoursn' < large_file.txt > 
+large_file_output2.txt] to measure time taken to run tr2u
+
+Output: It took 18.628 seconds to run the tr2u program
+
+real	0m18.628s
+user	0m4.986s
+sys		0m13.567s
+
+- Running the previous commands again, except copying files to terminal
+
+- [time ./tr2b 'belo what' 'is yoursn' < large_file.txt]
+
+Output: It took 1.762 seconds (real time)
+
+real	0m1.762s
+user	0m0.967s
+sys		0m0.259s
+
+- [time ./tr2u 'belo what' 'is yoursn' < large_file.txt]
+
+Output: It took 35.264 seconds (real time)
+
+real	0m35.264s
+user	0m9.933s
+sys		0m25.271s
+
+Overall, again, there is a drastic difference in performance between the two
+programs. This time, the differences are shown in the times required by
+each program to transliterate the same data. From these results, tr2b is
+observed to be around 20 times faster than fr2u. Furthermore, the results
+show that it is faster to print the results to stdout rather than to
+a file, which makes sense because outputting to a file may be another level
+of redirection.
+
+Homework:
+
+Instructions:
+Rewrite the sfrob program you wrote previously so that it uses system calls rather than <stdio.h> to read standard input and write standard output. Your program should use a small number of read system calls, ordinarily by determining the input file's size when possible and allocating a buffer that is slightly larger than that size. If the input's size cannot easily be determined (for example, because the input is a pipe), your program can start with a small buffer size of 8 KiB. Either way, your program should repeatedly append data to the buffer by reading the data (passing the largest count to read that cannot overrun the buffer) until read reports an error or end-of-file; if the buffer fills up, your program should reallocate the buffer to be twice as large as it was before and then resume reading. Assuming enough memory exists this approach should work even if the input file grows while your program is reading it, which is something that you should be able to test.
+
+When debugging, you may find the AddressSanitizer (asan) and the Undefined Behavior Sanitizer (ubsan) useful; these can be enabled with the GCC options -fsanitize=address and -fsanitize=undefined, respectively.
+
+Your program should do one thing in addition to sfrob. If given the -f option, your program should ignore case while sorting, by using the standard toupper function to upper-case each byte after decrypting and before comparing the byte. You can assume that each input byte represents a separate character; that is, you need not worry about multi-byte encodings. As noted in its specification, toupper's argument should be either EOF or a nonnegative value that is at most UCHAR_MAX (as defined in <limits.h>); hence one cannot simply pass a char value to toupper, as char is in the range CHAR_MIN..CHAR_MAX.
+
+Call the rewritten program sfrobu. Measure any differences in performance between sfrob and sfrobu using the time command. Run your program on inputs of varying numbers of input lines (say zero, 100, 10,000, and a million lines), and estimate the CPU time cost as a function of the number of input lines.
+
+Also, suppose the assignment were changed so that the rewritten program also had to use system calls rather than <stdlib.h> memory allocation functions such as malloc, reallocfree. Which system calls would the program use, and what would the calls' arguments look like? Use strace on your sfrobu runs on inputs of varying size, to deduce what system calls sfrobu uses to allocate memory (or to reallocate memory if the input file grows while sfrobu is running).
+
+
+
+
+Unfortunately I was not able to get my code to compile :(
+
+
+
+
+If system calls were implemented instead, we could see:
+
+int brk(void *addr);
+
+brk() would set a break value to addr, which defines the size of the allocated memory, and there is undefined behavior for previously allocated memory at that address
+
+int munmap(void *addr, size_t length);
+
+This is the equivalent of free(). The specified address range from addr to addr + length will have memory mappings freed. 
+
+mremap() can also be used to remap/reallocate memory. old_size size of memory at old_address will be expanded or shrunk to a size of new_size.
+
+void *sbrk(intptr_t incr);
+
+sbrk()
+ would add incr bytes to the break value, and change the allocated space accordingly. sbrk() can also take a negative incr value and decrease the allocated memory.
+
+
+Running strace with sfrobu, the results show that brk(), mmap(), munmap(), and mremap() increases with large input sizes
+
+
+
